@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:http_crud_using_provider_and_app_structure/src/feature/controllers/home_controller.dart';
 import 'package:http_crud_using_provider_and_app_structure/src/feature/view/pages/product_form_page.dart';
@@ -54,8 +55,7 @@ class HomePage extends StatelessWidget {
                             padding: const EdgeInsets.all(20),
                             width: MediaQuery.of(context).size.width,
                             decoration: BoxDecoration(
-                              color: const Color.fromRGBO(99, 7, 181, 1),
-                              // controller.colors[controller.backgroundColor],
+                              color: controller.colors[controller.backgroundColor],
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Column(
@@ -82,7 +82,7 @@ class HomePage extends StatelessWidget {
                                         color: Colors.yellow,
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: 5),
                                     GestureDetector(
                                       onTap: () async {
                                         await controller.deleteProduct(controller.items[index].id.toString());
@@ -91,6 +91,16 @@ class HomePage extends StatelessWidget {
                                         color: Colors.yellow,
                                       ),
                                     ),
+                                    const SizedBox(width: 5),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        FirebaseCrashlytics.instance.crash();
+                                      },
+                                      child: const Icon(Icons.error,
+                                        color: Colors.yellow,
+                                      ),
+                                    ),
+
                                   ],
                                 ),
                                 Text("Description:  ${controller.items[index].description}",

@@ -1,3 +1,4 @@
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -12,6 +13,36 @@ class HomeController extends ChangeNotifier{
   TextEditingController updatePriceController = TextEditingController();
   bool isLoading = false;
   List<Product> items = [];
+
+  final remoteConfig = FirebaseRemoteConfig.instance;
+
+  Map<String, Color> colors = {
+    "blue":Colors.blue,
+    "yellow":Colors.yellow,
+    "red":Colors.red,
+    "green":Colors.green,
+    "grey":Colors.grey,
+    "pink":Colors.pink,
+    "white":Colors.white,
+    "purple": const Color.fromRGBO(99, 7, 181, 1)
+  };
+
+  String backgroundColor = "white";
+
+  Future<void> fetchData() async {
+    await remoteConfig.fetchAndActivate().then((value) {
+      backgroundColor = remoteConfig.getString("background_color");
+    });
+  }
+
+  Future<void> initialConfig() async{
+    remoteConfig.setDefaults({"background_color" : backgroundColor,});
+    await fetchData();
+    remoteConfig.onConfigUpdated.listen((event) async{
+      await fetchData();
+      notifyListeners();
+    });
+  }
 
   Future<void> getAllProducts() async {
     String? result = await NetworkService.GET(NetworkService.apiOfProducts);
@@ -41,6 +72,11 @@ class HomeController extends ChangeNotifier{
 
   void initState(BuildContext context){
     getAllProducts();
+    initialConfig();
+    remoteConfig.onConfigUpdated.listen((event) async{
+      await remoteConfig.activate();
+      notifyListeners();
+    });
   }
 
 
